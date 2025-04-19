@@ -1,7 +1,39 @@
-import React from 'react'
+import React, { useState } from 'react'
 import '../styles/Clients.css'
 
 function Clients() {
+
+  const [clients,setClients]= useState({name:'',email:'',phone:'',address:''});
+
+  const onChange = (e) => {
+    setNote({ ...note, [e.target.name]: e.target.value })
+}
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await axios.post(
+      'http://localhost:5000/api/clients',
+      {
+        name: clients.name,
+        email: clients.email,
+        phone: clients.phone,
+        address: clients.address
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    );
+
+    console.log('Client added successfully:', res.data);
+  } catch (error) {
+    console.error('Addition failed:', error.response?.data || error.message);
+  }
+};
+
   return (
     <div className="clients container mt-4">
      <div className="d-flex justify-content-between align-items-center mb-3">
@@ -12,7 +44,7 @@ function Clients() {
     data-bs-toggle="modal"
     data-bs-target="#addClientModal"
   >
-    Add Client
+    + Add Client
   </button>
 </div>
 
@@ -27,21 +59,21 @@ function Clients() {
             </div>
 
             <div className="modal-body">
-              <form>
+              <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label htmlFor="clientName" className="form-label">Name</label>
-                  <input type="text" className="form-control" id="clientName" />
+                  <input type="text" className="form-control" id="clientName " value={clients.name} onChange={onChange} name='name' />
                 </div>
                 <div className="mb-3">
                   <label htmlFor="clientEmail" className="form-label">Email Address</label>
-                  <input type="email" className="form-control" id="clientEmail" />
+                  <input type="email" className="form-control" id="clientEmail" name='email' value={clients.email} onChange={onChange}/>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="clientPhone" className="form-label">Phone Number</label>
-                  <input type="text" className="form-control" id="clientPhone" />
+                  <input type="text" className="form-control" id="clientPhone" name='phone' value={clients.phone} onChange={onChange} />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="clientAddress" className="form-label">Address</label>
+                  <label htmlFor="clientAddress" className="form-label" name='address' value={clients.address} onChange={onChange} >Address</label>
                   <input type="text" className="form-control" id="clientAddress" />
                 </div>
               </form>
