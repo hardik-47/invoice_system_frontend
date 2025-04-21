@@ -8,9 +8,11 @@ import Clients from './pages/Clients';
 import Dashboard from './pages/Dashboard';
 import Invoices from './pages/Invoices';
 import InvoiceDetails from './pages/InvoiceDetails';
+import ClientState from './context/clientState';
 
 function App() {
   return (
+    <ClientState>
     <Router>
     <div className="app-container">
       <Sidebar />
@@ -27,6 +29,7 @@ function App() {
       </div>
     </div>
   </Router>
+  </ClientState>
   );
 }
 
