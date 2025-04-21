@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 function Clients() {
   const context = useContext(clientsContext);
-  const { clientsList, getClient, addClient } = context;
+  const { clientsList, getClient, addClient,delClient } = context;
   const navigate = useNavigate();
 
   const [clients, setClients] = useState({ name: '', email: '', phone: '', address: '' });
@@ -33,6 +33,8 @@ function Clients() {
       navigate('/login');
     }
   }, []);
+
+  
 
   return (
     <div className="clients container mt-4">
@@ -110,7 +112,7 @@ function Clients() {
               <td>{client.address}</td>
               <td>
                 <button className="btn btn-sm btn-warning me-2">Edit</button>
-                <button className="btn btn-sm btn-danger">Delete</button>
+                <button className="btn btn-sm btn-danger" onClick={()=>delClient(client.id)}>Delete</button>
               </td>
             </tr>
           ))}

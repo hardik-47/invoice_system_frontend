@@ -87,8 +87,12 @@ function Invoices() {
                             {/* Add your invoice form here */}
                             <form>
                                 <div className="mb-3">
-                                    <label className="form-label">Client Name</label>
+                                    <label className="form-label">Client ID</label>
                                     <input type="text" className="form-control" />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Due Date</label>
+                                    <input type="date" className="form-control" />
                                 </div>
 
                                 {items.map((item, index) => (

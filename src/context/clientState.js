@@ -44,10 +44,27 @@ const ClientState = (props) => {
     }
   };
 
-  
+  const delClient = async (id) => {
+
+    try {
+
+      const res = axios.delete(`http://localhost:5000/api/clients/${id}`, {
+        headers: {
+          Authorization: localStorage.getItem('token')
+        }
+      })
+    } catch (error) {
+      console.error('deletion failed:', error.response?.data || error.message);
+    }
+
+    // console.log(res.data);
+
+    const newlst= clientsList.filter(client=>{ return client.id!==id});
+    setclientList(newlst);
+  }
 
   return (
-    <clientsContext.Provider value={{ clientsList, setclientList, getClient, addClient }}>
+    <clientsContext.Provider value={{ clientsList, setclientList, getClient, addClient,delClient }}>
       {props.children}
     </clientsContext.Provider>
   );
