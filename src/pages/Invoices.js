@@ -1,22 +1,29 @@
-import React, { useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // import '../styles/Invoices.css';
+import invoiceContext from '../context/invoiceContext';
+// import { useNavigate } from 'react-router-dom';
 
 function Invoices() {
 
+    const context = useContext(invoiceContext);
+    const { invoiceList, addinvoice, getinvoice, delinvoice} = context;
+
+    const [formData, setFormData] = useState({ clientId: '', dueDate: '', items: [] });
+
     const navigate = useNavigate();
     const [items, setItems] = useState([
-        { description: '', quantity: 1, price: 0 },
+        { description: '', quantity: 1, unitPrice: 0 }
     ]);
 
     const handleItemChange = (index, field, value) => {
         const newItems = [...items];
-        newItems[index][field] = field === 'quantity' || field === 'price' ? parseFloat(value) || 0 : value;
+        newItems[index][field] = field === 'quantity' || field === 'unitPrice' ? parseFloat(value) || 0 : value;
         setItems(newItems);
     };
 
     const addItem = () => {
-        setItems([...items, { description: '', quantity: 1, price: 0 }]);
+        setItems([...items, { description: '', quantity: 1, unitPrice: 0 }]);
     };
 
     const removeItem = (index) => {
@@ -26,27 +33,43 @@ function Invoices() {
     };
 
     const getTotal = () => {
-        return items.reduce((acc, item) => acc + item.quantity * item.price, 0);
+        return items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0);
     };
 
-    const dummyInvoices = [
-        {
-            id: 1,
-            invoiceNumber: 'INV-001',
-            clientName: 'John Doe',
-            date: '2024-04-15',
-            amount: '₹2500',
-            status: 'Paid',
-        },
-        {
-            id: 2,
-            invoiceNumber: 'INV-002',
-            clientName: 'Jane Smith',
-            date: '2024-04-14',
-            amount: '₹4300',
-            status: 'Unpaid',
-        },
-    ];
+    const handleAddInvoice = (e) => {
+        e.preventDefault();
+
+        // Combine invoice form data and items array
+        const invoiceData = {
+            clientId: formData.clientId,
+            dueDate: formData.dueDate,
+            items: items
+        };
+
+        // Call context function
+        console.log(invoiceData);
+        addinvoice(invoiceData);
+
+        // Clear form after submission
+        setFormData({ clientId: '', dueDate: '', items: [] });
+        setItems([{ description: '', quantity: 1, unitPrice: 0 }]);
+
+        // Close modal after submit
+        const modalEl = document.getElementById('addInvoiceModal');
+        const modal = window.bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+    };
+
+
+    useEffect(() => {
+        if (localStorage.getItem('token')) {
+            getinvoice();
+        } else {
+            navigate('/login');
+        }
+    }, []);
+
+
 
     return (
         <div className="invoices p-4">
@@ -88,11 +111,21 @@ function Invoices() {
                             <form>
                                 <div className="mb-3">
                                     <label className="form-label">Client ID</label>
-                                    <input type="text" className="form-control" />
+                                    <input
+                                        type="number"
+                                        className="form-control"
+                                        value={formData.clientId}
+                                        onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
+                                    />
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Due Date</label>
-                                    <input type="date" className="form-control" />
+                                    <input
+                                        type="date"
+                                        className="form-control"
+                                        value={formData.dueDate}
+                                        onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                                    />
                                 </div>
 
                                 {items.map((item, index) => (
@@ -121,12 +154,12 @@ function Invoices() {
                                                     type="number"
                                                     className="form-control"
                                                     placeholder="Unit Price"
-                                                    value={item.price}
-                                                    onChange={(e) => handleItemChange(index, 'price', e.target.value)}
+                                                    value={item.unitPrice}
+                                                    onChange={(e) => handleItemChange(index, 'unitPrice', e.target.value)}
                                                 />
                                             </div>
                                             <div className="col-md-2 d-flex align-items-center">
-                                                ₹{(item.quantity * item.price).toFixed(2)}
+                                                ₹{(item.quantity * item.unitPrice).toFixed(2)}
                                             </div>
                                             <div className="col-md-1 d-flex align-items-center">
                                                 <button
@@ -156,7 +189,7 @@ function Invoices() {
                             >
                                 Close
                             </button>
-                            <button type="button" className="btn btn-primary">
+                            <button type="button" className="btn btn-primary" onClick={handleAddInvoice}>
                                 Save Invoice
                             </button>
                         </div>
@@ -179,13 +212,13 @@ function Invoices() {
                     </tr>
                 </thead>
                 <tbody>
-                    {dummyInvoices.map((invoice, index) => (
+                    {invoiceList.map((invoice, index) => (
                         <tr key={invoice.id}>
                             <td>{index + 1}</td>
                             <td>{invoice.invoiceNumber}</td>
-                            <td>{invoice.clientName}</td>
-                            <td>{invoice.date}</td>
-                            <td>{invoice.amount}</td>
+                            <td>{invoice.Client.name}</td>
+                            <td>{invoice.dueDate}</td>
+                            <td>{invoice.total}</td>
                             <td>
                                 <span
                                     className={`badge ${invoice.status === 'Paid' ? 'bg-success' : 'bg-warning'
@@ -196,7 +229,7 @@ function Invoices() {
                             </td>
                             <td>
                                 <button className="btn btn-sm btn-info me-2" onClick={() => navigate(`/invoices/${invoice.id}`)}>View</button>
-                                <button className="btn btn-sm btn-danger">Delete</button>
+                                <button className="btn btn-sm btn-danger" onClick={()=>{delinvoice(invoice.id)}}>Delete</button>
                             </td>
                         </tr>
                     ))}

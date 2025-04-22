@@ -9,9 +9,12 @@ import Dashboard from './pages/Dashboard';
 import Invoices from './pages/Invoices';
 import InvoiceDetails from './pages/InvoiceDetails';
 import ClientState from './context/clientState';
+import InvoiceState from './context/InvoiceState';
+
 
 function App() {
   return (
+    <InvoiceState>
     <ClientState>
     <Router>
     <div className="app-container">
@@ -30,6 +33,7 @@ function App() {
     </div>
   </Router>
   </ClientState>
+  </InvoiceState>
   );
 }
 
