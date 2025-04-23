@@ -217,7 +217,7 @@ function Invoices() {
                             <td>{index + 1}</td>
                             <td>{invoice.invoiceNumber}</td>
                             <td>{invoice.Client.name}</td>
-                            <td>{invoice.dueDate}</td>
+                            <td>{new Date(invoice.issueDate).toLocaleDateString()}</td>
                             <td>{invoice.total}</td>
                             <td>
                                 <span
